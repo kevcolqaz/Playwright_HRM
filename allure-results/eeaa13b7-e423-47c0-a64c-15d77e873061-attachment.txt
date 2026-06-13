@@ -1,0 +1,7 @@
+undefined: Error: No claim employee autocomplete match found for Test Automation
+
+Error: No claim employee autocomplete match found for Test Automation
+    at ClaimPage.selectEmployee (D:\software\Playwright_HRM\pages\claim.page.ts:71:11)
+    at ClaimPage.fillClaimRequest (D:\software\Playwright_HRM\pages\claim.page.ts:30:5)
+    at D:\software\Playwright_HRM\tests\claim-assign.spec.ts:20:5
+    at D:\software\Playwright_HRM\tests\claim-assign.spec.ts:19:3

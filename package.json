@@ -1,0 +1,25 @@
+{
+  "name": "playwright_hrm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test --project=chromium --project=firefox --project=webkit",
+    "test:headed": "playwright test --headed",
+    "test:browserstack": "browserstack-node-sdk playwright test --project=\"chrome@latest:windows 11@browserstack\" --project=\"firefox@latest:windows 11@browserstack\" --project=\"safari@latest:osx Ventura@browserstack\"",
+    "report": "playwright show-report",
+    "report:allure": "allure generate allure-results --clean -o allure-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.3",
+    "allure-commandline": "^2.42.1",
+    "allure-playwright": "^3.10.0",
+    "browserstack-local": "^1.5.13",
+    "browserstack-node-sdk": "^1.56.3"
+  }
+}
