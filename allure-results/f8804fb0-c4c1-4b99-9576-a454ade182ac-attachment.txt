@@ -1,0 +1,5 @@
+Test: admin can see the dashboard and assign a claim
+Project: chromium
+Location: D:\software\Playwright_HRM\tests\claim-assign.spec.ts
+Status: failed
+Expected: passed

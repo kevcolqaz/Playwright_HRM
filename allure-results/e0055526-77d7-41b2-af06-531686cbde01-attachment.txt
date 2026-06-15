@@ -1,0 +1,12 @@
+undefined: Error: page.goto: net::ERR_NETWORK_ACCESS_DENIED at https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+Call log:
+[2m  - navigating to "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login", waiting until "load"[22m
+
+
+Error: page.goto: net::ERR_NETWORK_ACCESS_DENIED at https://opensource-demo.orangehrmlive.com/web/index.php/auth/login
+Call log:
+[2m  - navigating to "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login", waiting until "load"[22m
+
+    at LoginPage.open (D:\software\Playwright_HRM\pages\login.page.ts:14:21)
+    at D:\software\Playwright_HRM\tests\claim-assign.spec.ts:6:21
+    at D:\software\Playwright_HRM\tests\claim-assign.spec.ts:5:3

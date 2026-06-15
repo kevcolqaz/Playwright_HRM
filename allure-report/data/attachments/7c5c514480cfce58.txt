@@ -1,0 +1,28 @@
+undefined: Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator: getByRole('heading', { name: 'Dashboard', level: 6 })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 5000ms[22m
+[2m  - waiting for getByRole('heading', { name: 'Dashboard', level: 6 })[22m
+
+
+Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+Locator: getByRole('heading', { name: 'Dashboard', level: 6 })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+[2m  - Expect "toBeVisible" with timeout 5000ms[22m
+[2m  - waiting for getByRole('heading', { name: 'Dashboard', level: 6 })[22m
+
+    at Header.expectModuleTitle (D:\software\Playwright_HRM\components\Header.ts:7:77)
+    at Header.expectDashboard (D:\software\Playwright_HRM\components\Header.ts:11:16)
+    at DashboardPage.expectVisible (D:\software\Playwright_HRM\pages\dashboard.page.ts:18:23)
+    at D:\software\Playwright_HRM\tests\claim-assign.spec.ts:7:25
+    at D:\software\Playwright_HRM\tests\claim-assign.spec.ts:5:3

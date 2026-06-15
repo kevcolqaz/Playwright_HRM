@@ -20,11 +20,14 @@ pipeline {
 
     stage('Run Local Matrix') {
       steps {
-        powershell 'npm run test'
+        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+          powershell 'npm run test'
+        }
       }
       post {
         always {
-          archiveArtifacts artifacts: 'playwright-report/**, allure-results/**, test-results/**', fingerprint: true
+          junit allowEmptyResults: true, testResults: 'artifacts/test-results/junit-results.xml'
+          archiveArtifacts artifacts: 'artifacts/playwright-report/**, artifacts/allure-results/**, artifacts/test-results/**', fingerprint: true
         }
       }
     }
@@ -34,14 +37,28 @@ pipeline {
         expression { return env.BROWSERSTACK_USERNAME?.trim() && env.BROWSERSTACK_ACCESS_KEY?.trim() }
       }
       steps {
-        powershell 'npm run test:browserstack'
+        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+          powershell 'npm run test:browserstack'
+        }
+      }
+      post {
+        always {
+          junit allowEmptyResults: true, testResults: 'artifacts/test-results/junit-results.xml'
+          archiveArtifacts artifacts: 'artifacts/allure-results/**, artifacts/test-results/**', fingerprint: true
+        }
+      }
+    }
+
+    stage('Generate Allure Report') {
+      steps {
+        powershell 'npm run report:allure'
       }
     }
   }
 
   post {
     always {
-      archiveArtifacts artifacts: 'playwright-report/**, allure-results/**, test-results/**, auth/storageState.json', fingerprint: true
+      archiveArtifacts artifacts: 'artifacts/**, auth/storageState.json, auth/auth-setup-error.*', fingerprint: true
     }
   }
 }

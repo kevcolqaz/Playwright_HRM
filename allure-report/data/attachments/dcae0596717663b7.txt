@@ -1,0 +1,11 @@
+undefined: Error: page.goto: net::ERR_ABORTED at https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index
+Call log:
+[2m  - navigating to "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index", waiting until "load"[22m
+
+
+Error: page.goto: net::ERR_ABORTED at https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index
+Call log:
+[2m  - navigating to "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index", waiting until "load"[22m
+
+    at D:\software\Playwright_HRM\tests\claim-assign.spec.ts:11:16
+    at D:\software\Playwright_HRM\tests\claim-assign.spec.ts:10:3

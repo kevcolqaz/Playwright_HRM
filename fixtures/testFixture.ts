@@ -1,4 +1,5 @@
 import { expect, test as base } from '@playwright/test';
+import path from 'node:path';
 import { ClaimPage } from '../pages/claim.page';
 import { DashboardPage } from '../pages/dashboard.page';
 import { LoginPage } from '../pages/login.page';
@@ -19,27 +20,13 @@ export const test = base.extend<AppFixtures>({
   claimPage: async ({ page }, use) => {
     await use(new ClaimPage(page));
   },
-  page: async ({ page, playwright }, use, testInfo) => {
-    if (testInfo.project.name.includes('browserstack')) {
-      const caps = buildBrowserStackCaps(testInfo);
-      const browser = await playwright.chromium.connect({
-        wsEndpoint: `wss://cdp.browserstack.com/playwright?caps=${encodeURIComponent(JSON.stringify(caps))}`,
-      });
-      const context = await browser.newContext(testInfo.project.use);
-      const remotePage = await context.newPage();
-
-      await use(remotePage);
-
-      await remotePage.close();
-      await browser.close();
-      return;
-    }
-
-    await use(page);
-  },
 });
 
 test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.project.name.includes('browserstack')) {
+    await updateBrowserStackSession(page, testInfo);
+  }
+
   if (testInfo.status !== testInfo.expectedStatus) {
     const screenshot = await page.screenshot({ fullPage: true });
     await testInfo.attach('error-screenshot', {
@@ -58,28 +45,37 @@ test.afterEach(async ({ page }, testInfo) => {
         contentType: 'text/plain',
       });
     }
+
+    const location = testInfo.location
+      ? `${path.relative(process.cwd(), testInfo.location.file)}:${testInfo.location.line}:${testInfo.location.column}`
+      : testInfo.file;
+
+    await testInfo.attach('failure-location', {
+      body: [
+        `Test: ${testInfo.title}`,
+        `Project: ${testInfo.project.name}`,
+        `Location: ${location}`,
+        `Status: ${testInfo.status}`,
+        `Expected: ${testInfo.expectedStatus}`,
+      ].join('\n'),
+      contentType: 'text/plain',
+    });
   }
 });
 
 export { expect };
 
-function buildBrowserStackCaps(testInfo: { project: { name: string } ; title: string; file: string }) {
-  const rawName = testInfo.project.name.replace(/@browserstack$/, '');
-  const [browserPart, osPart = 'Windows 11'] = rawName.split(':');
-  const [browserName = 'chrome', browserVersion = 'latest'] = browserPart.split('@');
-  const [os = 'Windows', ...osVersionParts] = osPart.trim().split(/\s+/);
-  const osVersion = osVersionParts.join(' ') || '11';
+async function updateBrowserStackSession(page: import('@playwright/test').Page, testInfo: import('@playwright/test').TestInfo) {
+  const status = testInfo.status === testInfo.expectedStatus ? 'passed' : 'failed';
+  const reason = testInfo.error?.message ?? `${testInfo.title} ${status}`;
 
-  return {
-    browserName,
-    browser_version: browserVersion,
-    os,
-    os_version: osVersion,
-    name: `${testInfo.file} - ${testInfo.title}`,
-    build: process.env.BROWSERSTACK_BUILD_NAME || 'playwright-hrm',
-    project: process.env.BROWSERSTACK_PROJECT_NAME || 'Playwright HRM',
-    'browserstack.username': process.env.BROWSERSTACK_USERNAME || '<USERNAME>',
-    'browserstack.accessKey': process.env.BROWSERSTACK_ACCESS_KEY || '<ACCESS_KEY>',
-    'browserstack.local': process.env.BROWSERSTACK_LOCAL || false,
-  };
+  await page
+    .evaluate(
+      (_) => {},
+      `browserstack_executor: ${JSON.stringify({
+        action: 'setSessionStatus',
+        arguments: { status, reason },
+      })}`,
+    )
+    .catch(() => undefined);
 }

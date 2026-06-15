@@ -1,5 +1,44 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const browserStackEnabled = Boolean(
+  process.env.BROWSERSTACK_USERNAME && process.env.BROWSERSTACK_ACCESS_KEY,
+);
+const authSetupEnabled = process.env.CREATE_AUTH_STATE === 'true';
+
+const localProjects = [
+  {
+    name: 'chromium',
+    use: { ...devices['Desktop Chrome'] },
+  },
+
+  {
+    name: 'firefox',
+    use: { ...devices['Desktop Firefox'] },
+  },
+
+  {
+    name: 'webkit',
+    use: { ...devices['Desktop Safari'] },
+  },
+];
+
+const browserStackProjects = [
+  {
+    name: 'chrome@latest:windows 11@browserstack',
+    use: { ...devices['Desktop Chrome'] },
+  },
+
+  {
+    name: 'firefox@latest:windows 11@browserstack',
+    use: { ...devices['Desktop Firefox'] },
+  },
+
+  {
+    name: 'safari@latest:osx Ventura@browserstack',
+    use: { ...devices['Desktop Safari'] },
+  },
+];
+
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
@@ -13,9 +52,10 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './tests',
+  outputDir: 'artifacts/test-results',
   /* Run tests in files in parallel */
   fullyParallel: true,
-  globalSetup: require.resolve('./hooks/globalSetup'),
+  globalSetup: authSetupEnabled ? require.resolve('./hooks/globalSetup') : undefined,
   globalTeardown: require.resolve('./hooks/globalTeardown'),
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
@@ -24,7 +64,12 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [['line'], ['html', { open: 'never' }], ['allure-playwright']],
+  reporter: [
+    ['line'],
+    ['html', { open: 'never', outputFolder: 'artifacts/playwright-report' }],
+    ['junit', { outputFile: 'artifacts/test-results/junit-results.xml' }],
+    ['allure-playwright', { detail: true, resultsDir: 'artifacts/allure-results' }],
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
@@ -38,45 +83,8 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    {
-      name: 'chrome@latest:windows 11@browserstack',
-      use: { ...devices['Desktop Chrome'] },
-    },
-
-    {
-      name: 'firefox@latest:windows 11@browserstack',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'safari@latest:osx Ventura@browserstack',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
+    ...localProjects,
+    ...(browserStackEnabled ? browserStackProjects : []),
 
     /* Test against branded browsers. */
     // {
